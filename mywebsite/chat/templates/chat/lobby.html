@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Lobby</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    
+</head>
+<body>
+    <h1>Lets chat!</h1>
+
+    <form id="form">
+        <div id="login" class="login">
+			<input
+				type="text"
+				id="nick"
+				class="nick"
+				placeholder="Введите свой ник..."
+				tabindex="1"
+			/>
+            <br><br>
+        <input type="text" 
+        name="message"
+        placeholder="Написать сообщение..."
+		tabindex="3"/>
+        <br><br>
+        <input type="submit" 
+        value="Отправить">
+      
+    </form>
+
+    <div id="messages"></div>
+
+    <script type="text/javascript">
+        // let url = `wss://${window.location.host}/ws/socket-server/`
+
+        let ws = new WebSocket("ws://localhost:8000/ws");
+        let messages = document.getElementById('messages');
+        let nick = document.getElementById('nick');
+        
+        // chatSocket.onmessage = function(e){
+        //     let data = JSON.parse(e.data)
+        //     console.log('Data:', data)
+        ws.onmessage = e => {
+            console.log(e.data) // Тут у нас строка
+            console.log('Data:', data)
+}
+// Отправить можем только строку
+        // chatSockets.send(JSON.stringify({ data: "привет" }))
+            
+
+            if(data.type === chat){
+                let messages = document.getElementById('messages')
+
+                messages.insertAdjacentHTML('beforeend', `<div>
+                                        <p>${data.message}</p>
+                                    </div>`)
+
+            }
+       
+
+        let form = document.getElementById('form')
+        form.addEventListener('submit', (e)=> {
+            e.preventDefault()
+            let message = e.target.message.value
+            chatSocket.send(JSON.stringify({
+                'message':message
+
+            }))
+
+            form.reset()
+        })
+
+
+    </script>
+</body>
+</html>
