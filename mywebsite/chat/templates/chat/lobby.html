@@ -35,7 +35,7 @@
     <script type="text/javascript">
         // let url = `wss://${window.location.host}/ws/socket-server/`
 
-        let ws = new WebSocket("ws://localhost:8000/ws");
+        let ws = new WebSocket("ws://localhost:8000/ws/");
         let messages = document.getElementById('messages');
         let nick = document.getElementById('nick');
         
@@ -43,29 +43,31 @@
         //     let data = JSON.parse(e.data)
         //     console.log('Data:', data)
         ws.onmessage = e => {
-            console.log(e.data) // Тут у нас строка
+            // console.log(e.data) // Тут у нас строка
+            // console.log('Data:', data)
+            let data = JSON.parse(e.data)
             console.log('Data:', data)
 }
 // Отправить можем только строку
-        // chatSockets.send(JSON.stringify({ data: "привет" }))
+        // ws.send(JSON.stringify({ data: "привет" }))
             
 
-            if(data.type === chat){
-                let messages = document.getElementById('messages')
+            // if(data.type === chat){
+            //     let messages = document.getElementById('messages')
 
-                messages.insertAdjacentHTML('beforeend', `<div>
-                                        <p>${data.message}</p>
-                                    </div>`)
+            //     messages.insertAdjacentHTML('beforeend', `<div>
+            //                             <p>${data.message}</p>
+            //                         </div>`)
 
-            }
+            // }
        
 
         let form = document.getElementById('form')
         form.addEventListener('submit', (e)=> {
             e.preventDefault()
             let message = e.target.message.value
-            chatSocket.send(JSON.stringify({
-                'message':message
+            ws.send(JSON.stringify({
+                'messages':messages
 
             }))
 
