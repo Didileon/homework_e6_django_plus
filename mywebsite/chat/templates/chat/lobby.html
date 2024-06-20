@@ -20,12 +20,36 @@
 				tabindex="1"
 			/>
             <br><br>
+            <div id="topName" class="topName"></div>
+			<div id="chat" class="chat">
+				<div class="messages"></div>
+				<div id="formConteiner" class="formConteiner">
+					<form name="publish" id="form" class="form">
+                       
+                        
+            <div class="messages"></div>
+				<div id="formConteiner" class="formConteiner">
+					<form name="publish" id="form" class="form">
+						<textarea
+							name="messages"
+							id="messages"
+							class="input"
+							placeholder="Написать сообщение..."
+							tabindex="3"
+						></textarea>
+                    </div>
+                    <div class="userListName"><h3>Список участников</h3></div>
+                    <div id="users" class="chat"></div>
+                        
+					</form>
+				<!-- </div>
         <input type="text" 
         name="message"
         placeholder="Написать сообщение..."
-		tabindex="3"/>
+		tabindex="3"/> -->
         <br><br>
         <input type="submit" 
+        id="messagesend"
         value="Отправить">
       
     </form>
@@ -35,44 +59,119 @@
     <script type="text/javascript">
         // let url = `wss://${window.location.host}/ws/socket-server/`
 
-        let ws = new WebSocket("ws://localhost:8000/ws/");
+        let ws = new WebSocket("ws://localhost:8000");
         let messages = document.getElementById('messages');
         let nick = document.getElementById('nick');
+        let topName = document.getElementById('topName');
+        let messagesend = document.getElementById('messagesend');let userList = document.getElementById('users');
         
-        // chatSocket.onmessage = function(e){
-        //     let data = JSON.parse(e.data)
-        //     console.log('Data:', data)
+        ws.onmessage = function(e){
+            let data = JSON.parse(e.data)
+            console.log('Data:', data)
+
+            if(data.type === chat){
+                let messages = document.getElementById('messages')
+
+                messages.insertAdjacentHTML('beforeend', `<div>
+                                        <p>${data.message}</p>
+                                    </div>`)
+
+            }
+       
+
+};
+
+        ws.onopen = function() {
+            ws.send(JSON.stringify({ test: 'hi webS!' }));
+            // return messages
+            console.log(messages);
+};
+
+//         ws.onmessage = function(e) {
+//             alert(`[message] Данные получены с сервера: ${e.data}`);
+
+//             console.log(message);
+            
+// };
         ws.onmessage = e => {
             // console.log(e.data) // Тут у нас строка
             // console.log('Data:', data)
             let data = JSON.parse(e.data)
-            console.log('Data:', data)
-}
-// Отправить можем только строку
-        // ws.send(JSON.stringify({ data: "привет" }))
-            
+            console.log(message);
+        }
 
-            // if(data.type === chat){
-            //     let messages = document.getElementById('messages')
 
-            //     messages.insertAdjacentHTML('beforeend', `<div>
-            //                             <p>${data.message}</p>
-            //                         </div>`)
-
-            // }
-       
-
-        let form = document.getElementById('form')
-        form.addEventListener('submit', (e)=> {
+            let form = document.getElementById('form')
+        form.addEventListener('submit'), (e)=> {
             e.preventDefault()
-            let message = e.target.message.value
+            let message = e.target.message.value}
             ws.send(JSON.stringify({
                 'messages':messages
+                
 
             }))
 
-            form.reset()
-        })
+        //     form.reset()
+        // })
+
+        ws.onmessage = function (e) {
+	let incomingMessage = JSON.parse(e.data);
+	if (incomingMessage.body === null) {
+		addUsers(incomingMessage.nickName);
+	} else {
+		showMessage(incomingMessage);
+	}
+};
+
+function showMessage(message) {
+	let messageConteiner = document.createElement('div');
+	messageConteiner.classList.add('messageConteinerInChat');
+	let userNameInChat = document.createElement('div');
+	let messageInChat = document.createElement('div');
+	messageInChat.classList.add('messageInChat');
+
+	userNameInChat.innerHTML = `${message.nickName}: `;
+	messageInChat.innerHTML = `${message.body}`;
+
+	messageConteiner.append(userNameInChat);
+	messageConteiner.append(messageInChat);
+	document.querySelector('.messages').append(messageConteiner);
+
+     
+}
+
+
+let messageToSend = {
+	nickName: null,
+	body: null,
+};
+
+nick.addEventListener('change', function () {
+	messageToSend.nickName = nick.value;
+});
+
+messagesend.addEventListener('click', function (e) {
+	topName.innerHTML = nick.value;
+	if (messageToSend.nickName == '' || messageToSend.nickName == null) {
+		return;
+	} else {
+		ws.send(JSON.stringify(messageToSend));
+		nick.value = null;
+	}
+
+});
+
+document.forms.publish.addEventListener('keydown', function (e) {
+	if (e.code === 'Enter') {
+		e.preventDefault();
+		messageToSend.body = this.elements.messages.value;
+		ws.send(JSON.stringify(messageToSend));
+		this.elements.messages.value = '';
+		messageToSend.body = null;
+	}
+});
+            
+
 
 
     </script>
