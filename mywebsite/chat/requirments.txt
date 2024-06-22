@@ -1,3 +1,9 @@
 pip install djangorestframework
 
 pip install channels
+
+npm install
+
+pip install mixins
+
+ pip install redis   
